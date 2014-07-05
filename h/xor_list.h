@@ -23,6 +23,7 @@ class xor_list {
         xor_list();
         ~xor_list();
 
+        const T& get(const unsigned int index) const;
         T pop();
         T shift();
         unsigned long length() const;
@@ -113,6 +114,32 @@ void xor_list<T>::push(T item) {
     else {
         _first_node = new_node;
         _last_node = _first_node;
+    }
+}
+
+template <typename T>
+const T& xor_list<T>::get(const unsigned int index) const {
+    if (index < ((unsigned long) _length/2.0) + (_length%2)) {
+        const xor_node* previous_node = 0;
+        const xor_node* current_node = _first_node;
+        for (unsigned int i=0; i<index; ++i) {
+            const xor_node* next_node = xor_list::get_next(previous_node, current_node);
+
+            previous_node = current_node;
+            current_node = next_node;
+        }
+        return current_node->value;
+    }
+    else {
+        const xor_node* previous_node = 0; // Since we're traversing backwords, this is current_node + 1, not current_node - 1.
+        const xor_node* current_node = _last_node;
+        for (unsigned int i=index+1; i<_length-1; ++i) {
+            const xor_node* next_node = xor_list::get_prev(current_node, previous_node);
+
+            previous_node = current_node;
+            current_node = next_node;
+        }
+        return current_node->value;
     }
 }
 
