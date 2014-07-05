@@ -52,17 +52,17 @@ int main() {
     list.print();
 
     // Get Test:
-    cout << "Testing get (even length):" << endl;
     for (unsigned int i=0; i<100; ++i) {
         list.push(i);
     }
+    cout << "Testing get (even length; length = " << list.length() << "):" << endl;
     for (unsigned int i=0; i<100; ++i) {
         cout << list.get(i) << " ";
     }
     cout << endl << endl;
 
-    cout << "Testing get (odd length):" << endl;
     list.push(100);
+    cout << "Testing get (odd length; length = " << list.length() << "):" << endl;
     for (unsigned int i=0; i<=100; ++i) {
         cout << list.get(i) << " ";
     }

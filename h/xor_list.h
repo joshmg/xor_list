@@ -34,7 +34,7 @@ class xor_list {
 
 template <typename T>
 void xor_list<T>::xor_node::print() const {
-    std::cout << "(" << (unsigned long) this << ") " << value << " (" << (unsigned long) address << ")" << std::endl;
+    std::cout << "(" << (unsigned long) this << ")\t" << value << "\t(" << (unsigned long) address << ")" << std::endl;
 }
 
 template <typename T>
@@ -78,7 +78,8 @@ unsigned long xor_list<T>::length() const {
 
 template <typename T>
 void xor_list<T>::print() const {
-    std::cout << "List:" << std::endl;
+    std::cout << "List:\t\t\t(Length: " << this->length() << ")" << std::endl;
+    std::cout << "(Address)\t(Value)\t(XOR Addr)" << std::endl;
     if (_first_node != 0) {
         _first_node->print();
 
@@ -176,6 +177,8 @@ T xor_list<T>::shift() {
         return T();
     }
     else if (_length == 1) {
+        --_length;
+
         T value = _first_node->value;
         delete _first_node;
         _first_node = 0;
