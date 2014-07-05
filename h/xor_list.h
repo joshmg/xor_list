@@ -10,6 +10,7 @@ class xor_list {
         struct xor_node {
             mutable const xor_node* address;
             T value;
+            // mutable T value;
             void print() const;
         };
 
@@ -23,14 +24,86 @@ class xor_list {
         xor_list();
         ~xor_list();
 
-        const T& get(const unsigned int index) const;
+        // T& get(const unsigned int index) const;
+        T get(const unsigned int index) const;
         T pop();
         T shift();
         unsigned long length() const;
         void push(T item);
 
         void print() const;
+
+        class const_iterator {
+            friend class xor_list;
+            private:
+                const xor_node* _previous_node;
+                const xor_node* _node;
+
+                const_iterator(const xor_node* previous_node, const xor_node* node);
+            public:
+                const T* value;
+                const_iterator& operator++();
+                const_iterator operator++(int);
+                bool operator==(const const_iterator& rhs) const;
+                bool operator!=(const const_iterator& rhs) const;
+                const T& operator*() const;
+        };
+
+
+        const_iterator begin() const;
+        const_iterator end() const;
 };
+
+template <typename T>
+typename xor_list<T>::const_iterator xor_list<T>::begin() const {
+    return const_iterator(0, _first_node);
+};
+
+template <typename T>
+typename xor_list<T>::const_iterator xor_list<T>::end() const {
+    return const_iterator(_last_node, 0);
+};
+
+template <typename T>
+xor_list<T>::const_iterator::const_iterator(const xor_node* previous_node, const xor_node* node) {
+    _previous_node = previous_node;
+    _node = node;
+    value = &_node->value;
+}
+
+template <typename T>
+typename xor_list<T>::const_iterator& xor_list<T>::const_iterator::operator++() {
+    const xor_node* next_node = xor_list::get_next(_previous_node, _node);
+    _previous_node = _node;
+    _node = next_node;
+    value = &_node->value;
+}
+template <typename T>
+typename xor_list<T>::const_iterator xor_list<T>::const_iterator::operator++(int) {
+    const_iterator it(_previous_node, _node);
+
+    const xor_node* next_node = xor_list::get_next(_previous_node, _node);
+    _previous_node = _node;
+    _node = next_node;
+    value = &_node->value;
+
+    return it;
+}
+
+template <typename T>
+bool xor_list<T>::const_iterator::operator==(const const_iterator& rhs) const {
+    return (_node == rhs._node);
+}
+
+template <typename T>
+bool xor_list<T>::const_iterator::operator!=(const const_iterator& rhs) const {
+    return (_node != rhs._node);
+}
+
+template <typename T>
+const T& xor_list<T>::const_iterator::operator*() const {
+    return (_node->value);
+}
 
 template <typename T>
 void xor_list<T>::xor_node::print() const {
@@ -119,7 +192,7 @@ void xor_list<T>::push(T item) {
 }
 
 template <typename T>
-const T& xor_list<T>::get(const unsigned int index) const {
+T xor_list<T>::get(const unsigned int index) const {
     if (index < ((unsigned long) _length/2.0) + (_length%2)) {
         const xor_node* previous_node = 0;
         const xor_node* current_node = _first_node;

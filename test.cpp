@@ -64,9 +64,22 @@ int main() {
     list.push(100);
     cout << "Testing get (odd length; length = " << list.length() << "):" << endl;
     for (unsigned int i=0; i<=100; ++i) {
+        /*
+            if (i == 25) {
+                list.get(i) = 0;
+            }
+        */
         cout << list.get(i) << " ";
     }
     cout << endl << endl;
+
+    cout << "Testing Const Iterator:" << endl;
+    xor_list<int>::const_iterator it = list.begin();
+    while (it != list.end()) {
+        cout << *it << " ";
+        ++it;
+    }
+    cout << endl;
 
     return 0;
 }
