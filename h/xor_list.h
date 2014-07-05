@@ -1,31 +1,61 @@
-#include "h/xor_list.h"
+#ifndef __XOR_LIST__
+#define __XOR_LIST__
+
 #include <new>
 #include <iostream>
+    
+template <typename T>
+class xor_list {
+    private:
+        struct xor_node {
+            mutable const xor_node* address;
+            T value;
+            void print() const;
+        };
 
-struct xor_list::xor_node {
-    mutable const xor_node* address;
-    T value;
+        static const xor_node* get_next(const xor_node* previous_node, const xor_node* current_node);
+        static const xor_node* get_prev(const xor_node* current_node, const xor_node* next_node);
+        unsigned long _length;
+        const xor_node* _first_node;
+        const xor_node* _last_node;
+
+    public:
+        xor_list();
+        ~xor_list();
+
+        T pop();
+        T shift();
+        unsigned long length() const;
+        void push(T item);
+
+        void print() const;
 };
 
-void xor_node::print() const {
+template <typename T>
+void xor_list<T>::xor_node::print() const {
     std::cout << "(" << (unsigned long) this << ") " << value << " (" << (unsigned long) address << ")" << std::endl;
 }
 
-static const xor_node* xor_list::get_next(const xor_node* previous_node, const xor_node* current_node) {
+template <typename T>
+const typename xor_list<T>::xor_node* xor_list<T>::get_next(const xor_node* previous_node, const xor_node* current_node) {
     if (current_node->address == 0) return 0;
     else return (xor_node*) ((unsigned long) previous_node ^ (unsigned long) current_node->address);
 }
 
-static const xor_node* xor_list::get_prev(const xor_node* current_node, const xor_node* next_node) {
+template <typename T>
+const typename xor_list<T>::xor_node* xor_list<T>::get_prev(const xor_node* current_node, const xor_node* next_node) {
     return (xor_node*) ((unsigned long) current_node->address ^ (unsigned long) next_node);
 }
 
-xor_list::xor_list() {
+template <typename T>
+xor_list<T>::xor_list() {
     _first_node = 0;
     _last_node = 0;
     _length = 0;
 }
-xor_list::~xor_list() {
+
+template <typename T>
+xor_list<T>::~xor_list() {
     if (_first_node != 0) {
         const xor_node* previous_node = 0;
         const xor_node* current_node = _first_node;
@@ -40,11 +70,13 @@ xor_list::~xor_list() {
     }
 }
 
-unsigned long xor_list::length() const {
+template <typename T>
+unsigned long xor_list<T>::length() const {
     return _length;
 }
 
-void xor_list::print() const {
+template <typename T>
+void xor_list<T>::print() const {
     std::cout << "List:" << std::endl;
     if (_first_node != 0) {
         _first_node->print();
@@ -64,7 +96,8 @@ void xor_list::print() const {
     std::cout << std::endl;
 }
 
-void xor_list::push(T item) {
+template <typename T>
+void xor_list<T>::push(T item) {
     ++_length;
     xor_node* new_node = new xor_node();
     new_node->value = item;
@@ -83,7 +116,8 @@ void xor_list::push(T item) {
     }
 }
 
-T xor_list::pop() {
+template <typename T>
+T xor_list<T>::pop() {
     // List is empty
     if (_length == 0) return T(); // _last_node->value;
     // Removing last item from the list
@@ -109,7 +143,8 @@ T xor_list::pop() {
     }
 }
 
-T xor_list::shift() {
+template <typename T>
+T xor_list<T>::shift() {
     if (_length == 0) {
         return T();
     }
@@ -132,3 +167,5 @@ T xor_list::shift() {
         return value;
     }
 }
+
+#endif
