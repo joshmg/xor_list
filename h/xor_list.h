@@ -25,18 +25,20 @@ class xor_list {
 
         T& front();
         const T& front() const;
+        T& back();
+        const T& back() const;
 
         T& get(const unsigned int index);
         T& operator[](const unsigned int index);
-
         const T& get(const unsigned int index) const;
         const T& operator[](const unsigned int index) const;
 
         T pop_back();
         T pop_front();
-        unsigned long length() const;
         void push_back(T item);
         void push_front(T item);
+
+        unsigned long length() const;
 
         void print() const;
 
@@ -303,6 +305,16 @@ T& xor_list<T>::front() {
 template <typename T>
 const T& xor_list<T>::front() const {
     return _first_node->value;
+}
+
+template <typename T>
+T& xor_list<T>::back() {
+    return _last_node->value;
+}
+
+template <typename T>
+const T& xor_list<T>::back() const {
+    return _last_node->value;
 }
 
 template <typename T>

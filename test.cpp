@@ -113,6 +113,13 @@ int main() {
 
     cout << "Testing front():" << endl;
     cout << list.front() << endl;
+    list.front() = 999;
+    cout << list.front() << endl;
+    cout << endl << endl;
+    cout << "Testing back():" << endl;
+    cout << list.back() << endl;
+    list.back() = 999;
+    cout << list.back() << endl;
     cout << endl << endl;
 
 
