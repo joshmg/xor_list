@@ -52,9 +52,14 @@ class xor_list {
             public:
                 iterator& operator++();
                 iterator operator++(int);
+                iterator& operator--();
+                iterator operator--(int);
                 bool operator==(const iterator& rhs) const;
                 bool operator!=(const iterator& rhs) const;
                 T& operator*();
+
+                bool has_next() const;
+                bool has_prev() const;
         };
 
         class const_iterator {
@@ -67,9 +72,14 @@ class xor_list {
             public:
                 const_iterator& operator++();
                 const_iterator operator++(int);
+                const_iterator& operator--();
+                const_iterator operator--(int);
                 bool operator==(const const_iterator& rhs) const;
                 bool operator!=(const const_iterator& rhs) const;
                 const T& operator*() const;
+
+                bool has_next() const;
+                bool has_prev() const;
         };
 
 
@@ -128,6 +138,24 @@ typename xor_list<T>::iterator xor_list<T>::iterator::operator++(int) {
 
     return iterator(previous_node, node);
 }
+template <typename T>
+typename xor_list<T>::iterator& xor_list<T>::iterator::operator--() {
+    xor_node* new_previous_node = xor_list::get_prev(_previous_node, _node);
+    _node = _previous_node;
+    _previous_node = new_previous_node;
+
+    return (*this);
+}
+template <typename T>
+typename xor_list<T>::iterator xor_list<T>::iterator::operator--(int) {
+    iterator it(_previous_node, _node);
+
+    xor_node* new_previous_node = xor_list::get_prev(_previous_node, _node);
+    _node = _previous_node;
+    _previous_node = new_previous_node;
+
+    return it;
+}
 
 template <typename T>
 bool xor_list<T>::iterator::operator==(const iterator& rhs) const {
@@ -142,6 +170,15 @@ bool xor_list<T>::iterator::operator!=(const iterator& rhs) const {
 template <typename T>
 T& xor_list<T>::iterator::operator*() {
     return (_node->value);
+}
+
+template <typename T>
+bool xor_list<T>::iterator::has_next() const {
+    return (_node->address != _previous_node);
+}
+template <typename T>
+bool xor_list<T>::iterator::has_prev() const {
+    return (_previous_node != 0);
 }
 
 // end iterator definitions
@@ -174,6 +211,24 @@ typename xor_list<T>::const_iterator xor_list<T>::const_iterator::operator++(int
 
     return const_iterator(previous_node, node);
 }
+template <typename T>
+typename xor_list<T>::const_iterator& xor_list<T>::const_iterator::operator--() {
+    const xor_node* new_previous_node = xor_list::get_prev(_previous_node, _node);
+    _node = _previous_node;
+    _previous_node = new_previous_node;
+
+    return (*this);
+}
+template <typename T>
+typename xor_list<T>::const_iterator xor_list<T>::const_iterator::operator--(int) {
+    const_iterator it(_previous_node, _node);
+
+    const xor_node* new_previous_node = xor_list::get_prev(_previous_node, _node);
+    _node = _previous_node;
+    _previous_node = new_previous_node;
+
+    return it;
+}
 
 template <typename T>
 bool xor_list<T>::const_iterator::operator==(const const_iterator& rhs) const {
@@ -190,6 +245,15 @@ const T& xor_list<T>::const_iterator::operator*() const {
     return (_node->value);
 }
 
+template <typename T>
+bool xor_list<T>::const_iterator::has_next() const {
+    return (_node->address != _previous_node);
+}
+template <typename T>
+bool xor_list<T>::const_iterator::has_prev() const {
+    return (_previous_node != 0);
+}
+
 // end const_iterator definitions
 
 template <typename T>
@@ -199,12 +263,13 @@ void xor_list<T>::xor_node::print() const {
 
 template <typename T>
 typename xor_list<T>::xor_node* xor_list<T>::get_next(const xor_node* previous_node, const xor_node* current_node) {
-    if (current_node->address == 0) return 0;
+    if (current_node == 0 || current_node->address == 0) return 0;
     else return (xor_node*) ((unsigned long) previous_node ^ (unsigned long) current_node->address);
 }
 
 template <typename T>
 typename xor_list<T>::xor_node* xor_list<T>::get_prev(const xor_node* current_node, const xor_node* next_node) {
+    if (current_node == 0 || current_node->address == 0) return 0;
     return (xor_node*) ((unsigned long) current_node->address ^ (unsigned long) next_node);
 }
 

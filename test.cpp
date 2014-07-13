@@ -57,7 +57,7 @@ int main() {
     for (unsigned int i=0; i<100; ++i) {
         list.push_back(i);
     }
-    cout << "Testing get (even length; length = " << list.length() << "):" << endl;
+    cout << "Testing get (even length; length = " << list.length() << "; operator[]):" << endl;
     for (unsigned int i=0; i<100; ++i) {
         const unsigned int z = list[i];
         cout << z << " ";
@@ -67,9 +67,9 @@ int main() {
     list.get(50) = 999;
 
     list.push_back(100);
-    cout << "Testing get (odd length; length = " << list.length() << "):" << endl;
+    cout << "Testing get (odd length; length = " << list.length() << "; get()):" << endl;
     for (unsigned int i=0; i<=100; ++i) {
-        cout << list[i] << " ";
+        cout << list.get(i) << " ";
     }
     cout << endl << endl;
 
@@ -79,41 +79,22 @@ int main() {
     for (unsigned int i=1; i<100; ++i) {
         list.push_front(-i);
     }
-    cout << "Testing get (even length; length = " << list.length() << "):" << endl;
+    cout << "Testing get (even length; length = " << list.length() << "; get()):" << endl;
+    for (unsigned int i=0; i<list.length(); ++i) {
+        cout << list.get(i) << " ";
+    }
+    cout << endl << endl;
+
+    list.push_front(-100);
+    cout << "Testing get (odd length; length = " << list.length() << "; operator[]):" << endl;
     for (unsigned int i=0; i<list.length(); ++i) {
         cout << list[i] << " ";
     }
     cout << endl << endl;
-
-    list.push_front(-101);
-    cout << "Testing get (odd length; length = " << list.length() << "):" << endl;
-    for (unsigned int i=0; i<list.length(); ++i) {
-        cout << list[i] << " ";
-    }
-    cout << endl << endl;
-
-
-
-    cout << "Testing Const ++Iterator:" << endl;
-    xor_list<int>::const_iterator it = list.cbegin();
-    while (it != list.cend()) {
-        cout << *it << " ";
-        ++it;
-    }
-    cout << endl << endl;
-
-    cout << "Testing Const Iterator++:" << endl;
-    it = list.cbegin();
-    while (it != list.cend()) {
-        cout << *it << " ";
-        it++;
-    }
-    cout << endl << endl;
-
 
     cout << "Testing front():" << endl;
     cout << list.front() << endl;
-    list.front() = 999;
+    list.front() = -999;
     cout << list.front() << endl;
     cout << endl << endl;
     cout << "Testing back():" << endl;
@@ -123,21 +104,68 @@ int main() {
     cout << endl << endl;
 
 
-    cout << "Testing NonConst Iterator:" << endl;
-    xor_list<int>::iterator vit = list.begin();
-    while (vit != list.end()) {
-        xor_list<int>::iterator tmp_it = vit++;
-        (*tmp_it) = 0;
-        cout << ".";
-        ++tmp_it; // Just to be sure the ++operator is compiled.
+    cout << "Testing Const ++Iterator:" << endl;
+    xor_list<int>::const_iterator const_it = list.cbegin();
+    while (const_it != list.cend()) {
+        cout << *const_it << " ";
+        ++const_it;
     }
     cout << endl << endl;
 
     cout << "Testing Const Iterator++:" << endl;
-    it = list.cbegin();
-    while (it != list.cend()) {
-        cout << *it << " ";
-        it++;
+    const_it = list.cbegin();
+    while (const_it != list.cend()) {
+        cout << *const_it << " ";
+        const_it++;
+    }
+    cout << endl << endl;
+
+    cout << "Testing Const Iterator has_next():" << endl;
+    if (list.length() > 0) {
+        const_it = list.cbegin();
+        do {
+            cout << *const_it << " ";
+        } while ((const_it++).has_next());
+    }
+    cout << endl << endl;
+
+    cout << "Testing Iterator-- (has_prev()):" << endl;
+    xor_list<int>::iterator it = list.end();
+    if (list.length() > 0) {
+        while ((it--).has_prev()) {
+            cout << *it << " ";
+            xor_list<int>::iterator tmp_it = it;
+            --tmp_it;
+        };
+    }
+    cout << endl << endl;
+
+    cout << "Testing Const Iterator-- (has_prev()):" << endl;
+    const_it = list.cend();
+    if (list.length() > 0) {
+        while ((const_it--).has_prev()) {
+            cout << *const_it << " ";
+            xor_list<int>::const_iterator tmp_it = const_it;
+            --tmp_it;
+        };
+    }
+    cout << endl << endl;
+
+    cout << "Testing Iterator (it==end compare) and dereferenced assigment:" << endl;
+    it  = list.begin();
+    while (it != list.end()) {
+        xor_list<int>::iterator tmp_it = it++;
+        (*tmp_it) = 0;
+        cout << *tmp_it << " ";
+        ++tmp_it; // Just to be sure the ++operator is compiled.
+    }
+    cout << endl << endl;
+
+    cout << "Testing Const Iterator (dereferenced assignment continued...):" << endl;
+    const_it = list.cbegin();
+    while (const_it != list.cend()) {
+        cout << *const_it << " ";
+        const_it++;
     }
     cout << endl << endl;
 
