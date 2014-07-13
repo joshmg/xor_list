@@ -29,7 +29,8 @@ class xor_list {
         T pop();
         T shift();
         unsigned long length() const;
-        void push(T item);
+        void push_back(T item);
+        void push_front(T item);
 
         void print() const;
 
@@ -172,7 +173,7 @@ void xor_list<T>::print() const {
 }
 
 template <typename T>
-void xor_list<T>::push(T item) {
+void xor_list<T>::push_back(T item) {
     ++_length;
     xor_node* new_node = new xor_node();
     new_node->value = item;
@@ -192,29 +193,44 @@ void xor_list<T>::push(T item) {
 }
 
 template <typename T>
-T xor_list<T>::get(const unsigned int index) const {
-    if (index < ((unsigned long) _length/2.0) + (_length%2)) {
-        const xor_node* previous_node = 0;
-        const xor_node* current_node = _first_node;
-        for (unsigned int i=0; i<index; ++i) {
-            const xor_node* next_node = xor_list::get_next(previous_node, current_node);
+void xor_list<T>::push_front(T item) {
+    ++_length;
+    xor_node* new_node = new xor_node();
+    new_node->value = item;
+    new_node->address = 0;
 
-            previous_node = current_node;
-            current_node = next_node;
-        }
-        return current_node->value;
+    if (_first_node != 0) {
+        _first_node->address = (xor_node*) (((unsigned long) new_node) ^ ((unsigned long) (_first_node->address)));
+        new_node->address = _first_node;
+
+        _first_node = new_node;
     }
     else {
-        const xor_node* previous_node = 0; // Since we're traversing backwords, this is current_node + 1, not current_node - 1.
-        const xor_node* current_node = _last_node;
-        for (unsigned int i=index+1; i<_length-1; ++i) {
-            const xor_node* next_node = xor_list::get_prev(current_node, previous_node);
-
-            previous_node = current_node;
-            current_node = next_node;
-        }
-        return current_node->value;
+        _first_node = new_node;
+        _last_node = _first_node;
     }
+}
+
+template <typename T>
+T xor_list<T>::get(const unsigned int index) const {
+    const bool from_front = index < ((unsigned long) _length/2.0);
+    const xor_node* previous_node = 0;
+    const xor_node* current_node = (from_front ? _first_node : _last_node);
+    const unsigned int iterations = (from_front ? index : _length-index-1);
+    for (unsigned int i=0; i<iterations; ++i) {
+
+        const xor_node* next_node =
+            (
+                from_front ?
+                    xor_list::get_next(previous_node, current_node)
+                :
+                    xor_list::get_prev(current_node, previous_node)
+            );
+
+        previous_node = current_node;
+        current_node = next_node;
+    }
+    return current_node->value;
 }
 
 template <typename T>

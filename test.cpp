@@ -7,12 +7,12 @@ int main() {
     xor_list<int> list;
 
     cout << "Testing Push, Pop/Shift, Print: " << endl;
-    list.push(120);
-    list.push(121);
-    list.push(122);
-    list.push(123);
-    list.push(124);
-    list.push(125);
+    list.push_back(120);
+    list.push_back(121);
+    list.push_back(122);
+    list.push_back(123);
+    list.push_back(124);
+    list.push_back(125);
 
     list.print();
 
@@ -29,12 +29,12 @@ int main() {
     list.pop();
     list.print();
 
-    list.push(120);
-    list.push(121);
-    list.push(122);
-    list.push(123);
-    list.push(124);
-    list.push(125);
+    list.push_back(120);
+    list.push_back(121);
+    list.push_back(122);
+    list.push_back(123);
+    list.push_back(124);
+    list.push_back(125);
 
     list.print();
 
@@ -50,10 +50,12 @@ int main() {
     list.print();
     list.shift();
     list.print();
+
+
 
     // Get Test:
     for (unsigned int i=0; i<100; ++i) {
-        list.push(i);
+        list.push_back(i);
     }
     cout << "Testing get (even length; length = " << list.length() << "):" << endl;
     for (unsigned int i=0; i<100; ++i) {
@@ -61,17 +63,33 @@ int main() {
     }
     cout << endl << endl;
 
-    list.push(100);
+    list.push_back(100);
     cout << "Testing get (odd length; length = " << list.length() << "):" << endl;
     for (unsigned int i=0; i<=100; ++i) {
-        /*
-            if (i == 25) {
-                list.get(i) = 0;
-            }
-        */
         cout << list.get(i) << " ";
     }
     cout << endl << endl;
+
+
+
+    // push_front Test:
+    for (unsigned int i=1; i<100; ++i) {
+        list.push_front(-i);
+    }
+    cout << "Testing get (even length; length = " << list.length() << "):" << endl;
+    for (unsigned int i=0; i<list.length(); ++i) {
+        cout << list.get(i) << " ";
+    }
+    cout << endl << endl;
+
+    list.push_front(-101);
+    cout << "Testing get (odd length; length = " << list.length() << "):" << endl;
+    for (unsigned int i=0; i<list.length(); ++i) {
+        cout << list.get(i) << " ";
+    }
+    cout << endl << endl;
+
+
 
     cout << "Testing Const Iterator:" << endl;
     xor_list<int>::const_iterator it = list.begin();
