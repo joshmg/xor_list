@@ -169,6 +169,47 @@ int main() {
     }
     cout << endl << endl;
 
+    cout << "Re-Assigning Values... (Length: " << list.length() << ":" << endl;
+    unsigned int i = 0;
+    it = list.begin();
+    while (it != list.end()) {
+        *it = i++;
+        cout << ".";
+        ++it;
+    }
+    cout << endl << endl;
+
+    cout << "Testing Iterator Const Cast:" << endl;
+    const_it = list.begin(); // iterator cast to const_iterator
+    while (const_it != list.end()) {
+        cout << *const_it << " ";
+        const_it++;
+    }
+    cout << endl << endl;
+
+    cout << "Testing Split:" << endl;
+    it = list.begin();
+    for (unsigned int i=0; i<list.length(); ++i) {
+        ++it;
+    }
+    xor_list<int> t = list.split(it);
+
+    cout << "Original List: " << list.length() << endl;
+    const_it = list.begin();
+    while (const_it != list.end()) {
+        cout << *const_it << " ";
+        const_it++;
+    }
+    cout << endl;
+
+    cout << "New List: " << t.length() << endl;
+    const_it = t.begin();
+    while (const_it != t.end()) {
+        cout << *const_it << " ";
+        const_it++;
+    }
+    cout << endl << endl;
+
     return 0;
 }
 

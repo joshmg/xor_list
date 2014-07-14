@@ -1,9 +1,9 @@
-#ifndef __XOR_LIST__
-#define __XOR_LIST__
+#ifndef XOR_LIST_H
+#define XOR_LIST_H
 
 #include <new>
 #include <iostream>
-    
+
 template <typename T>
 class xor_list {
     private:
@@ -15,11 +15,17 @@ class xor_list {
 
         static xor_node* get_next(const xor_node* previous_node, const xor_node* current_node);
         static xor_node* get_prev(const xor_node* current_node, const xor_node* next_node);
-        unsigned long _length;
+        mutable unsigned long _length;
+        mutable bool _is_length_set;
         xor_node* _first_node;
         xor_node* _last_node;
 
+        void _count_length() const;
+
     public:
+        class iterator;
+        class const_iterator;
+
         xor_list();
         ~xor_list();
 
@@ -40,6 +46,11 @@ class xor_list {
 
         unsigned long length() const;
 
+        // Splits the current list into two lists at the iterator.
+        // The item pointed to by iterator is the first element added to the new list. (It's inclusive to the new list)
+        // This function modifies the current list.
+        xor_list<T> split(iterator it);
+
         void print() const;
 
         class iterator {
@@ -56,10 +67,14 @@ class xor_list {
                 iterator operator--(int);
                 bool operator==(const iterator& rhs) const;
                 bool operator!=(const iterator& rhs) const;
+                bool operator==(const const_iterator& rhs) const;
+                bool operator!=(const const_iterator& rhs) const;
                 T& operator*();
 
                 bool has_next() const;
                 bool has_prev() const;
+
+                operator const_iterator() const;
         };
 
         class const_iterator {
@@ -81,7 +96,6 @@ class xor_list {
                 bool has_next() const;
                 bool has_prev() const;
         };
-
 
         iterator begin();
         iterator end();
@@ -168,6 +182,15 @@ bool xor_list<T>::iterator::operator!=(const iterator& rhs) const {
 }
 
 template <typename T>
+bool xor_list<T>::iterator::operator==(const const_iterator& rhs) const {
+    return (_node == rhs._node);
+}
+template <typename T>
+bool xor_list<T>::iterator::operator!=(const const_iterator& rhs) const {
+    return (_node != rhs._node);
+}
+
+template <typename T>
 T& xor_list<T>::iterator::operator*() {
     return (_node->value);
 }
@@ -179,6 +202,11 @@ bool xor_list<T>::iterator::has_next() const {
 template <typename T>
 bool xor_list<T>::iterator::has_prev() const {
     return (_previous_node != 0);
+}
+
+template <typename T>
+xor_list<T>::iterator::operator const_iterator() const {
+    return const_iterator(_previous_node, _node);
 }
 
 // end iterator definitions
@@ -278,6 +306,7 @@ xor_list<T>::xor_list() {
     _first_node = 0;
     _last_node = 0;
     _length = 0;
+    _is_length_set = true;
 }
 
 template <typename T>
@@ -292,13 +321,57 @@ xor_list<T>::~xor_list() {
             current_node = next_node;
 
             delete previous_node;
-        } while (current_node != _last_node);
+        } while (current_node != _last_node && current_node != 0);
     }
 }
 
 template <typename T>
+void xor_list<T>::_count_length() const {
+    xor_node* previous_node = 0;
+    xor_node* node = _first_node;
+    _length = 0;
+    while (node != 0 && node != _last_node) {
+        xor_node* tmp = xor_list::get_next(previous_node, node);
+        previous_node = node;
+        node = tmp;
+
+        ++_length;
+    }
+    _is_length_set = true;
+}
+
+template <typename T>
 unsigned long xor_list<T>::length() const {
+    if (!_is_length_set) _count_length();
     return _length;
+}
+
+template <typename T>
+xor_list<T> xor_list<T>::split(iterator it) {
+    if (it == this->end()) return xor_list();
+
+    xor_list<T> list;
+    list._first_node = it._node;
+    list._first_node->address = (xor_node*) ((unsigned long) list._first_node->address ^ (unsigned long) it._previous_node);
+    list._last_node = _last_node;
+
+    list._length = 0;
+    list._is_length_set = false;
+
+    if (_first_node == it._node) {
+        _last_node = 0;
+        _first_node = 0;
+        _length = 0;
+        _is_length_set = true;
+    }
+    else {
+        _last_node = it._previous_node;
+        _last_node->address = (xor_node*) ((unsigned long) _last_node->address ^ (unsigned long) it._node);
+        _length = 0;
+        _is_length_set = false;
+    }
+
+    return list;
 }
 
 template <typename T>
@@ -438,6 +511,8 @@ const T& xor_list<T>::operator[](const unsigned int index) const {
 
 template <typename T>
 T xor_list<T>::pop_back() {
+    if (!_is_length_set) _count_length();
+
     // List is empty
     if (_length == 0) return T(); // _last_node->value;
     // Removing last item from the list
