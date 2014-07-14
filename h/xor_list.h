@@ -49,7 +49,10 @@ class xor_list {
         // Splits the current list into two lists at the iterator.
         // The item pointed to by iterator is the first element added to the new list. (It's inclusive to the new list)
         // This function modifies the current list.
-        xor_list<T> split(iterator it);
+        xor_list<T>* split(iterator it);
+        void join(xor_list<T>*& list);
+
+        void flip();
 
         void print() const;
 
@@ -327,17 +330,23 @@ xor_list<T>::~xor_list() {
 
 template <typename T>
 void xor_list<T>::_count_length() const {
-    xor_node* previous_node = 0;
-    xor_node* node = _first_node;
-    _length = 0;
-    while (node != 0 && node != _last_node) {
-        xor_node* tmp = xor_list::get_next(previous_node, node);
-        previous_node = node;
-        node = tmp;
-
-        ++_length;
+    if (_first_node == 0) {
+        _length = 0;
+        _is_length_set = true;
     }
-    _is_length_set = true;
+    else {
+        xor_node* previous_node = 0;
+        xor_node* node = _first_node;
+        _length = 1;
+        while (node != 0 && node != _last_node) {
+            xor_node* tmp = xor_list::get_next(previous_node, node);
+            previous_node = node;
+            node = tmp;
+
+            ++_length;
+        }
+        _is_length_set = true;
+    }
 }
 
 template <typename T>
@@ -347,16 +356,16 @@ unsigned long xor_list<T>::length() const {
 }
 
 template <typename T>
-xor_list<T> xor_list<T>::split(iterator it) {
-    if (it == this->end()) return xor_list();
+xor_list<T>* xor_list<T>::split(iterator it) {
+    if (it == this->end()) return new xor_list<T>();
 
-    xor_list<T> list;
-    list._first_node = it._node;
-    list._first_node->address = (xor_node*) ((unsigned long) list._first_node->address ^ (unsigned long) it._previous_node);
-    list._last_node = _last_node;
+    xor_list<T>* list = new xor_list<T>();
+    list->_first_node = it._node;
+    list->_first_node->address = xor_list::get_next(it._previous_node, it._node);
+    list->_last_node = _last_node;
 
-    list._length = 0;
-    list._is_length_set = false;
+    list->_length = 0;
+    list->_is_length_set = false;
 
     if (_first_node == it._node) {
         _last_node = 0;
@@ -366,12 +375,45 @@ xor_list<T> xor_list<T>::split(iterator it) {
     }
     else {
         _last_node = it._previous_node;
-        _last_node->address = (xor_node*) ((unsigned long) _last_node->address ^ (unsigned long) it._node);
+        _last_node->address = xor_list<T>::get_prev(it._previous_node, it._node);
+        // _last_node->address = 0;
         _length = 0;
         _is_length_set = false;
     }
 
     return list;
+}
+template <typename T>
+void xor_list<T>::join(xor_list<T>*& list) {
+    list->_first_node->address = (xor_node*) ((unsigned long) list->_first_node->address ^ (unsigned long) _last_node);
+    _last_node->address = (xor_node*) ((unsigned long) _last_node->address ^ (unsigned long) list->_first_node);
+    _last_node = list->_last_node;
+    
+    if (_is_length_set) {
+        if (list->_is_length_set) {
+            _length += list->length();
+        }
+        else {
+            _length = 0;
+            _is_length_set = false;
+        }
+    }
+
+    // Consume list..
+    list->_first_node = 0;
+    list->_last_node = 0;
+    list->_length = 0;
+    list->_is_length_set = true;
+    delete list;
+    list = 0;
+}
+
+template <typename T>
+void xor_list<T>::flip() {
+    // Swap _first_node and _last_node
+    _first_node = (xor_node*) ((unsigned long) _first_node ^ (unsigned long) _last_node);
+    _last_node = (xor_node*) ((unsigned long) _last_node ^ (unsigned long) _first_node);
+    _first_node = (xor_node*) ((unsigned long) _first_node ^ (unsigned long) _last_node);
 }
 
 template <typename T>
@@ -383,7 +425,7 @@ void xor_list<T>::print() const {
 
         const xor_node* previous_node = 0;
         const xor_node* current_node = _first_node;
-        while (current_node != _last_node) {
+        while (current_node != 0 && current_node != _last_node) {
             const xor_node* next_node = xor_list::get_next(previous_node, current_node);
 
             previous_node = current_node;

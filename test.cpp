@@ -187,12 +187,21 @@ int main() {
     }
     cout << endl << endl;
 
+    cout << "Testing Flip:" << endl;
+    list.flip();
+    const_it = list.begin();
+    while (const_it != list.end()) {
+        cout << *const_it << " ";
+        const_it++;
+    }
+    cout << endl << endl;
+
     cout << "Testing Split:" << endl;
     it = list.begin();
-    for (unsigned int i=0; i<list.length(); ++i) {
+    for (unsigned int i=0; i<list.length()/2; ++i) {
         ++it;
     }
-    xor_list<int> t = list.split(it);
+    xor_list<int>* t = list.split(it);
 
     cout << "Original List: " << list.length() << endl;
     const_it = list.begin();
@@ -200,15 +209,47 @@ int main() {
         cout << *const_it << " ";
         const_it++;
     }
-    cout << endl;
+    cout << endl << endl;
 
-    cout << "New List: " << t.length() << endl;
-    const_it = t.begin();
-    while (const_it != t.end()) {
+    cout << "Original List (Flipped): " << list.length() << endl;
+    list.flip();
+    const_it = list.begin();
+    while (const_it != list.end()) {
         cout << *const_it << " ";
         const_it++;
     }
     cout << endl << endl;
+
+    cout << "New List: " << t->length() << endl;
+    const_it = t->begin();
+    while (const_it != t->end()) {
+        cout << *const_it << " ";
+        const_it++;
+    }
+    cout << endl << endl;
+
+    cout << "New List (Flipped): " << t->length() << endl;
+    t->flip();
+    const_it = t->begin();
+    while (const_it != t->end()) {
+        cout << *const_it << " ";
+        const_it++;
+    }
+    cout << endl << endl;
+
+    cout << "Testing join(): " << endl;
+    list.flip();
+    t->flip();
+    list.join(t);
+    const_it = list.begin();
+    while (const_it != list.end()) {
+        cout << *const_it << " ";
+        ++const_it;
+    }
+    cout << endl << endl;
+
+    delete t;
+    t = 0;
 
     return 0;
 }
