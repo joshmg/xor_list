@@ -1,3 +1,8 @@
+#ifndef XOR_LIST_CPP
+#define XOR_LIST_CPP
+
+#include "h/xor_list.h"
+
 template <typename T>
 typename xor_list<T>::iterator xor_list<T>::begin() {
     return iterator(0, _first_node);
@@ -519,3 +524,5 @@ T xor_list<T>::pop_front() {
         return value;
     }
 }
+
+#endif
