@@ -385,17 +385,27 @@ xor_list<T>* xor_list<T>::split(iterator it) {
 }
 template <typename T>
 void xor_list<T>::join(xor_list<T>*& list) {
-    list->_first_node->address = (xor_node*) ((unsigned long) list->_first_node->address ^ (unsigned long) _last_node);
-    _last_node->address = (xor_node*) ((unsigned long) _last_node->address ^ (unsigned long) list->_first_node);
-    _last_node = list->_last_node;
-    
-    if (_is_length_set) {
-        if (list->_is_length_set) {
-            _length += list->length();
+    if (! (list->_first_node == 0)) {
+        if (_first_node == 0) {
+            _first_node = list->_first_node;
+            _last_node = list->_last_node;
+            _length = list->_length;
+            _is_length_set = list->_is_length_set;
         }
         else {
-            _length = 0;
-            _is_length_set = false;
+            list->_first_node->address = (xor_node*) ((unsigned long) list->_first_node->address ^ (unsigned long) _last_node);
+            _last_node->address = (xor_node*) ((unsigned long) _last_node->address ^ (unsigned long) list->_first_node);
+            _last_node = list->_last_node;
+            
+            if (_is_length_set) {
+                if (list->_is_length_set) {
+                    _length += list->length();
+                }
+                else {
+                    _length = 0;
+                    _is_length_set = false;
+                }
+            }
         }
     }
 
@@ -417,6 +427,18 @@ void xor_list<T>::flip() {
 }
 
 template <typename T>
+T find_smallest(const xor_list<T>& list) {
+    T smallest;
+    typename xor_list<T>::const_iterator it = list.cbegin();
+    smallest = *it;
+    while (it != list.cend()) {
+        if (*it < smallest) smallest = *it;
+        ++it;
+    }
+    return smallest;
+}
+
+template <typename T>
 void xor_list<T>::print() const {
     std::cout << "List:\t\t\t(Length: " << this->length() << ")" << std::endl;
     std::cout << "(Address)\t(Value)\t(XOR Addr)" << std::endl;
@@ -435,7 +457,7 @@ void xor_list<T>::print() const {
         }
     }
 
-    std::cout << std::endl;
+    std::cout << std::endl << std::flush;
 }
 
 template <typename T>
